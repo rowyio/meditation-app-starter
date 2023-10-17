@@ -1,4 +1,6 @@
-# Meditate GPT
+# meditation-app-starter
+
+AI powered Meditation App - Start kit built with Next.js, Vercel and BuildShip
 
 Generate a meditation session complete with a relaxing background, featuring gentle music, and guided breathing exercises to help you achieve a state of deep relaxation and mindfulness.
 
