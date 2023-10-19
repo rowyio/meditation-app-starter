@@ -73,6 +73,7 @@ export default function Home() {
           "You'll receive the meditation audio in your inbox once it has finished generating",
       });
       setGenerating(false);
+      return;
     }
 
     if (!response.ok) {
@@ -94,11 +95,10 @@ export default function Home() {
     }
 
     const data = await response.json();
-    console.log("done", data);
     setAudioUrl(data.meditation);
 
     toast({
-      title: "Meditation generated ✅",
+      title: "Meditation generated ",
       description: "Click play, relax, and enjoy!",
     });
     setGenerating(false);
