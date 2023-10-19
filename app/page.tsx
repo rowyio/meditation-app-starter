@@ -66,6 +66,15 @@ export default function Home() {
       body: JSON.stringify(body),
     });
 
+    if (body.email && response.status == 204) {
+      toast({
+        title: "Generating Meditation",
+        description:
+          "You'll receive the meditation audio in your inbox once it has finished generating",
+      });
+      setGenerating(false);
+    }
+
     if (!response.ok) {
       if (response.status == 403) {
         toast({
@@ -85,15 +94,8 @@ export default function Home() {
     }
 
     const data = await response.json();
+    console.log("done", data);
     setAudioUrl(data.meditation);
-
-    if (body.email) {
-      toast({
-        title: "Generating Meditation",
-        description:
-          "You'll receive the meditation audio in your inbox once it has finished generating",
-      });
-    }
 
     toast({
       title: "Meditation generated ✅",
