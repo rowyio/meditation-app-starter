@@ -27,6 +27,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { MoonIcon, SunIcon } from "@radix-ui/react-icons";
+import { Input } from "@/components/ui/input";
 
 const formSchema = z.object({
   description: z.string().min(6, {
@@ -35,6 +36,7 @@ const formSchema = z.object({
   duration: z.enum(["300", "600"], {
     required_error: "You need to select a duration.",
   }),
+  email: z.string().email("This is not a valid email.").optional(),
 });
 
 export default function Home() {
@@ -48,13 +50,13 @@ export default function Home() {
     defaultValues: {
       description: "",
       duration: "300",
+      email: undefined,
     },
   });
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
     setGenerating(true);
     const body = { ...values, duration: Number(values.duration) };
-    console.log(body);
     const url = process.env.NEXT_PUBLIC_WORKFLOW_ENDPOINT as string;
     const response = await fetch(url, {
       method: "POST",
@@ -82,8 +84,17 @@ export default function Home() {
       return;
     }
 
-    const data = await response.text();
-    setAudioUrl(data);
+    const data = await response.json();
+    setAudioUrl(data.meditation);
+
+    if (body.email) {
+      toast({
+        title: "Generating Meditation",
+        description:
+          "You'll receive the meditation audio in your inbox once it has finished generating",
+      });
+    }
+
     toast({
       title: "Meditation generated ✅",
       description: "Click play, relax, and enjoy!",
@@ -132,7 +143,7 @@ export default function Home() {
             <Form {...form}>
               <form
                 onSubmit={form.handleSubmit(onSubmit)}
-                className="space-y-8"
+                className="space-y-6"
               >
                 <FormField
                   control={form.control}
@@ -187,13 +198,32 @@ export default function Home() {
                     </FormItem>
                   )}
                 />
+                <FormField
+                  control={form.control}
+                  name="email"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Email</FormLabel>
+                      <FormControl>
+                        <Input {...field} />
+                      </FormControl>
+                      <FormDescription>
+                        Enter your email to receive the meditation audio via
+                        email once it&apos;s generated
+                      </FormDescription>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
                 <div className="space-y-2">
-                  <Button type="submit" disabled={generating}>
-                    {generating && (
-                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                    )}
-                    {generating ? "Generating" : "Generate"}
-                  </Button>
+                  <div className="flex items-center gap-2">
+                    <Button type="submit" disabled={generating}>
+                      {generating && (
+                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                      )}
+                      {generating ? "Generating" : "Generate"}
+                    </Button>
+                  </div>
                   {!generating && (
                     <p className="text-sm text-muted-foreground">
                       Generate a meditation session complete with a relaxing
@@ -204,7 +234,7 @@ export default function Home() {
                   )}
                   {generating && (
                     <p className="text-sm">
-                      Please be patient, this usually takes around 2-3 minutes.
+                      Please be patient, this usually takes around 2-4 minutes.
                     </p>
                   )}
                 </div>
